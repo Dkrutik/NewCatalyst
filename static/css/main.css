@@ -1,0 +1,53 @@
+.hide{
+    display: none;
+}
+
+.pointer{
+    cursor: pointer;
+}
+
+.industry-box{
+    width: auto;
+    cursor: pointer;
+}
+
+.industry-box:hover{
+    background-color: #6ea8fe;
+}
+
+.sticky-side {
+    position: -webkit-sticky; /* For Safari */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.table-container {
+    height: 75vh;
+    overflow-y: auto;
+    /* border: 1px solid #ccc; */
+}
+
+thead.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* th, td {
+    word-wrap: break-word;
+    white-space: normal;
+} */
+
+.custom-col-1 {
+    width: 10%;
+}
+.custom-col-2 {
+    width: 20%;
+}
+.custom-col-3 {
+    width: 30%;
+}
+.custom-col-4 {
+    width: 40%;
+}

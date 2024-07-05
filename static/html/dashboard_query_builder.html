@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+{% block base%}
+    <div class="container">
+        <div id="alertBox">
+        </div>
+
+        <hr>
+        <h2>Query Builder</h2>
+        <hr>
+        <div class="accordion" id="accordionMain">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Query Parameters
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="keyword" placeholder="Keyword">
+                                    <label for="floatingInput">Keyword</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="industry" placeholder="Industry" data-bs-toggle="modal" data-bs-target="#industryModal">
+                                    <label for="floatingInput">Industry</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating mb-3">
+                                    <input type="date" class="form-control" id="year_founded" placeholder="Year Founded">
+                                    <label for="floatingInput">Year Founded</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="city" placeholder="City">
+                                    <label for="floatingInput">City</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="state" placeholder="State">
+                                    <label for="floatingInput">State</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="country" placeholder="Country">
+                                    <label for="floatingInput">Country</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-floating mb-3">
+                                    <input type="number" min="0" class="form-control" id="employees_from" placeholder="Employees (From)">
+                                    <label for="floatingInput">Employees (From)</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating mb-3">
+                                    <input type="number" min="1" class="form-control" id="employees_to" placeholder="Employees (To)">
+                                    <label for="floatingInput">Employees (To)</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-around">
+                            <button type="button" class="btn btn-secondary px-5" id="resetBtn">Reset</button>
+                            <button type="button" class="btn btn-primary px-5" id="searchBtn">Query</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <!-- TABLE HERE -->
+        <div class="table-container table-responsive">
+
+            <table class="table table-striped table-hover">
+                <thead class="sticky-header">
+                    <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Company Name</th>
+                    <th scope="col">Year Founded</th>
+                    <th scope="col">Domain</th>
+                    <th scope="col">Industry</th>
+                    <th scope="col">Size Range</th>
+                    <th scope="col">Locality</th>
+                    <th scope="col">Country</th>
+                    <th scope="col">Linkedin URL</th>
+                    <th scope="col">Employees Current Estimate</th>
+                    <th scope="col">Employees Total Estimate</th>
+                    </tr>
+                </thead>
+                <tbody class="" id="companyTable">
+                </tbody>
+            </table>
+        </div>
+        <nav class="d-flex justify-content-center w-100">
+            <ul class="pagination">
+              <li class="page-item "><a class="page-link bg-primary text-light" id="previous" href="#">Previous</a></li>
+              <li class="page-item "><a class="page-link" id="countShow" href="#">0-0</a></li>
+              <li class="page-item"><a class="page-link bg-primary text-light" id="next" href="#">Next</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="industryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Select Industry</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex flex-wrap" id="industry_container">
+
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const industryObj = document.getElementById('industry_container');
+        const keywordTBObj = document.getElementById('keyword');
+        const industryTBObj = document.getElementById('industry');
+        const yearFoundedTBObj = document.getElementById('year_founded');
+        const cityTBObj = document.getElementById('city');
+        const stateTBObj = document.getElementById('state');
+        const countryTBObj = document.getElementById('country');
+        const employeesFromTBObj = document.getElementById('employees_from');
+        const employeesToTBObj = document.getElementById('employees_to');
+        const companyTableObj = document.getElementById('companyTable');
+        const alertBoxObj = document.getElementById('alertBox');
+        const previousLink = document.getElementById("previous");
+        const nextLink = document.getElementById("next");
+        let counter = 1;
+        
+        document.getElementById('industry').addEventListener('click',async function(){
+            try {
+                const response = await fetch('/api/fetch/industries/');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok' + response.statusText);
+                }
+                const data = await response.json();
+
+                data.forEach(industry => {
+                    const industryDiv = document.createElement('div');
+                    industryDiv.classList.add('p-2','m-2','border','rounded','industry-box');
+                    industryDiv.id = `industry-${industry.id}`;
+                    industryDiv.setAttribute("data-bs-dismiss","modal");
+                    industryDiv.setAttribute("onclick", `addIndustry('${industry.industry_name}')`);
+                    industryDiv.innerHTML = `${industry.industry_name}`;
+                    industryObj.appendChild(industryDiv);
+                });
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+            }
+        })
+
+        function addIndustry(industryText){
+            industryTBObj.value = industryText;
+        }
+
+        document.getElementById('resetBtn').addEventListener('click',function(){
+            industryObj.value = '';
+            keywordTBObj.value = '';
+            industryTBObj.value = '';
+            yearFoundedTBObj.value = '';
+            cityTBObj.value = '';
+            stateTBObj.value = '';
+            countryTBObj.value = '';
+            employeesFromTBObj.value = '';
+            employeesToTBObj.value = '';
+        })
+
+        document.getElementById('searchBtn').addEventListener('click', async function(){
+            let data = {
+                industry: industryTBObj.value,
+                keyword: keywordTBObj.value,
+                year_founded: yearFoundedTBObj.value,
+                city: cityTBObj.value,
+                state: stateTBObj.value,
+                country: countryTBObj.value,
+                employees_from: employeesFromTBObj.value,
+                employees_to: employeesToTBObj.value,
+            };
+
+            const response = await fetch('/api/fetch/companies/', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+
+            const dump = await response.json();
+            previousLink.addEventListener('click',pvsLink(dump.previousLink));
+            nextLink.addEventListener('click',nxtLink(dump.next));
+            const result = dump.results
+            alertBoxObj.innerHTML=`    
+                <div class="alert alert-success pointer mt-3" onclick="this.remove()" role="alert">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg> ${dump.count} records found for the query.
+                </div>
+            `;
+            popTable(result);
+        });
+
+        function popTable(result){
+            companyTableObj.innerHTML = "";
+            for (const company of result){
+                const newTR = document.createElement('tr');
+
+                newTR.innerHTML  =  `
+                    <th scope="row">${counter}</th>
+                    <td>${company.company_name}</td>
+                    <td>${company.year_founded.slice(0, 4)}</td>
+                    <td>${company.company_domain}</td>
+                    <td>${company.industry}</td>
+                    <td>${company.size_range}</td>
+                    <td>${company.locality}</td>
+                    <td>${company.country}</td>
+                    <td><a target="_blank" href='https://${company.linkedin_url}'>${company.linkedin_url}</a></td>
+                    <td>${company.current_estimate}</td>
+                    <td>${company.total_estimate}</td>
+                `
+                counter++;
+                companyTableObj.appendChild(newTR);
+            }
+        }
+
+        function pvsLink(link){
+
+        }
+
+        async function nxtLink(link) {
+            let data = {
+                industry: industryTBObj.value,
+                keyword: keywordTBObj.value,
+                year_founded: yearFoundedTBObj.value,
+                city: cityTBObj.value,
+                state: stateTBObj.value,
+                country: countryTBObj.value,
+                employees_from: employeesFromTBObj.value,
+                employees_to: employeesToTBObj.value,
+            };
+
+            try {
+                const response = await fetch(link, {
+                    method: 'POST',
+                    body: data,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const dump = await response.json();
+                console.log(dump);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+    </script>
+{% endblock %}

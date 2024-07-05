@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block base%}
+    <div class="container">
+        <hr>
+        <h2>Upload Data</h2>
+        <hr>
+        <div class="input-group mb-3">
+            <input type="file" class="form-control" id="uploadFile" accept=".csv">
+            <button type="button" id="uploadBtn" class="btn btn-md btn-primary">Start Upload</button>
+        </div>
+
+        <br>
+        <div class="mt-5 hide" id="uploadBlock">
+            <h4>Upload Progress:</h4>
+            <div class="progress mt-2" role="progressbar">
+                <div class="progress-bar" id="uploadProgress" style="width: 0%"></div>
+            </div>
+            <h5 id="uploadStatus" class="mt-1">Status</h5>
+        </div>
+    </div>
+    <script>
+
+        document.getElementById("uploadBtn").addEventListener('click',async function(){
+            document.getElementById('uploadBlock').classList.toggle('hide');
+            const fileInput = document.getElementById('uploadFile');
+            const file = fileInput.files[0];
+            const uuid = generateUUID();
+            const uniqueFileName = `${uuid}_${file.name}`;
+            const chunkSize = 1024 * 1024;
+            const totalChunks = Math.ceil(file.size / chunkSize);
+            const url = '/api/upload/task/';
+            const csrfToken = getCookie('csrftoken');
+
+
+            for (let chunkNumber = 1; chunkNumber <= totalChunks; chunkNumber++) {
+                const start = (chunkNumber - 1) * chunkSize;
+                const end = chunkNumber * chunkSize;
+                const chunk = file.slice(start, end);
+
+                const formData = new FormData();
+                formData.append('file', chunk);
+                formData.append('chunkNumber', chunkNumber);
+                formData.append('totalChunks', totalChunks);
+                formData.append('fileName', uniqueFileName);
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+
+                const result = await response.json();
+                const progress = (chunkNumber / totalChunks) * 100;
+                document.getElementById('uploadProgress').style.width = `${progress}%`;
+                document.getElementById('uploadStatus').innerText = `Part ${chunkNumber}/${totalChunks} uploaded`;
+
+                if (result.status === 'done') {
+                    document.getElementById('uploadStatus').innerText = 'Upload complete. Data queued for processing. Data should be availilable for query within the next few minutes or hours depending on its queue position or file size.';
+                    fileInput.value = '';
+                    document.querySelector('.custom-file-label').textContent = 'No file chosen';
+                }
+            }
+        })
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const fileInput = document.getElementById('uploadFile');
+            const fileLabel = document.querySelector('.custom-file-label');
+
+            fileInput.addEventListener('change', function(event) {
+                const fileName = fileInput.files[0] ? fileInput.files[0].name : 'Select File';
+                fileLabel.textContent = fileName;
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block base%}
+    <div class="container">
+        <hr>
+            <button type="button" class="btn btn-primary float-end btn-md"  data-bs-toggle="modal" data-bs-target="#userModal">Add Users</button>
+            <h2>Users</h2>
+        <hr>
+  
+        <div class="modal fade" id="userModal" tabindex="-1">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h1 class="modal-title fs-5">Add New User</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="first_name" placeholder="First Name">
+                                    <label for="first_name">First Name</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="last_name" placeholder="Last Name">
+                                    <label for="last_name">Last Name</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="emailNew" placeholder="name@example.com">
+                            <label for="emailNew">Email</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="passwordNew1" placeholder="Password">
+                            <label for="passwordNew1">Password</label>
+                        </div>
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="passwordNew2" placeholder="Retype Password">
+                            <label for="passwordNew2">Retype Password</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
